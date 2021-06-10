@@ -1,18 +1,18 @@
 ---
 generic-service:
-  nameOverride: hmpps-template-typescript
+  nameOverride: hmpps-manage-assess-risks-and-needs
 
   replicaCount: 4
 
   image:
-    repository: quay.io/hmpps/hmpps-template-typescript
-    tag: app_version    # override at deployment time
+    repository: quay.io/hmpps/hmpps-manage-assess-risks-and-needs
+    tag: app_version # override at deployment time
     port: 3000
 
   ingress:
     enabled: true
-    host: app-hostname.local    # override per environment
-    tlsSecretName: hmpps-template-typescript-cert
+    host: app-hostname.local # override per environment
+    tlsSecretName: hmpps-manage-assess-risks-and-needs-cert
     path: /
 
   livenessProbe:
@@ -35,14 +35,14 @@ generic-service:
   #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
 
   namespace_secrets:
-    hmpps-template-typescript:
-      APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+    hmpps-manage-assess-risks-and-needs:
       API_CLIENT_ID: "API_CLIENT_ID"
       API_CLIENT_SECRET: "API_CLIENT_SECRET"
       SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
       SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       SESSION_SECRET: "SESSION_SECRET"
-    hmpps-template-typescript-elasticache-redis:
+      APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+    hmpps-assessments-elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
 
@@ -55,4 +55,4 @@ generic-service:
     cloudplatform-live1-3: "35.177.252.54/32"
 
 generic-prometheus-alerts:
-  targetApplication: hmpps-template-typescript
+  targetApplication: hmpps-manage-assess-risks-and-needs

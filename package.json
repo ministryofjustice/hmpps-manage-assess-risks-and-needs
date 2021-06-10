@@ -1,8 +1,8 @@
 {
-  "name": "hmpps-template-typescript",
+  "name": "hmpps-manage-assess-risks-and-needs",
   "version": "0.0.1",
-  "description": "HMPPS Typescript Template",
-  "repository": "git@github.com:ministryofjustice/hmpps-template-typescript.git",
+  "description": "Hmpps Manage Assess Risks And Needs",
+  "repository": "git@github.com:ministryofjustice/hmpps-manage-assess-risks-and-needs.git",
   "license": "MIT",
   "scripts": {
     "postinstall": "husky install",
