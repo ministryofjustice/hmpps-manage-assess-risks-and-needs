@@ -16,6 +16,8 @@ The easiest way to run the app is to use docker compose to create the service an
 
 ### Dependencies
 The app requires: 
+* hmpps-auth - for authentication
+* redis - session store and token caching
 
 ### Runing the app for development
 
