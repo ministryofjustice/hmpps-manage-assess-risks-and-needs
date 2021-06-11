@@ -1,6 +1,5 @@
 import express from 'express'
 
-import path from 'path'
 import createError from 'http-errors'
 
 import indexRoutes from './routes'

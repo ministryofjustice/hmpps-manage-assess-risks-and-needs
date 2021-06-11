@@ -1,7 +1,5 @@
 import express, { Router, Express } from 'express'
-import cookieSession from 'cookie-session'
 import createError from 'http-errors'
-import path from 'path'
 
 import allRoutes from '../index'
 import nunjucksSetup from '../../utils/nunjucksSetup'
@@ -20,7 +18,6 @@ function appSetup(route: Router, production: boolean): Express {
     next()
   })
 
-  app.use(cookieSession({ keys: [''] }))
   app.use(express.json())
   app.use(express.urlencoded({ extended: true }))
   app.use('/', route)
