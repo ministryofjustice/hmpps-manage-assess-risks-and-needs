@@ -41,6 +41,8 @@ generic-service:
     hmpps-risk-assessment-ui:
       API_CLIENT_ID: "API_CLIENT_ID"
       API_CLIENT_SECRET: "API_CLIENT_SECRET"
+    hmpps-manage-assess-risks-and-needs:
+      SESSION_SECRET: "SESSION_SECRET"
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
     hmpps-assessments-elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
