@@ -10,6 +10,8 @@ generic-service:
 
   env:
     INGRESS_URL: "https://manage-assess-risks-and-needs-dev.hmpps.service.justice.gov.uk"
+    HMPPS_AUTH_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/auth"
+    TOKEN_VERIFICATION_API_URL: "https://sign-in-dev.hmpps.service.justice.gov.uk/verification"
 
 generic-prometheus-alerts:
   enabled: false
