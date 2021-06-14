@@ -19,13 +19,13 @@ export default class QuestionGroup {
   displayOrder: number
 
   @Column({ name: 'mandatory' })
-  mandatory = false
+  mandatory: boolean
 
   @Column({ name: 'validation' })
-  validation: string = null
+  validation: string
 
   @Column({ name: 'read_only' })
-  readOnly = false
+  readOnly: boolean
 
   @ManyToOne('Grouping', 'contents', { eager: false })
   @JoinColumn({ name: 'group_uuid', referencedColumnName: 'groupUuid' })
