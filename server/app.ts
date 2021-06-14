@@ -20,6 +20,8 @@ import setUpHealthChecks from './middleware/setUpHealthChecks'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
 import Question from './repositories/entities/question'
+import QuestionGroup from './repositories/entities/questionGroup'
+import Grouping from './repositories/entities/grouping'
 
 export default function createApplication(userService: UserService, databaseConnection: Connection): Application {
   const app = express()
@@ -38,9 +40,11 @@ export default function createApplication(userService: UserService, databaseConn
   app.use(authorisationMiddleware())
 
   const questionRepository = databaseConnection.getRepository(Question)
+  const questionGroupRepository = databaseConnection.getRepository(QuestionGroup)
+  const groupingRepository = databaseConnection.getRepository(Grouping)
 
   app.use('/', indexRoutes(standardRouter(userService)))
-  app.use('/', indexRoutes(questionRouter(questionRepository)))
+  app.use('/', indexRoutes(questionRouter(questionRepository, questionGroupRepository, groupingRepository)))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

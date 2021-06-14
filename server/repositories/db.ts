@@ -1,6 +1,8 @@
 import { Connection, ConnectionOptions, createConnection } from 'typeorm'
 import logger from '../../logger'
+import Grouping from './entities/grouping'
 import Question from './entities/question'
+import QuestionGroup from './entities/questionGroup'
 
 type ConnectionResult = [Error?, Connection?]
 
@@ -12,12 +14,9 @@ const connectionOptions: ConnectionOptions = {
   username: String(process.env.DATABASE_USER),
   password: String(process.env.DATABASE_PASSWORD),
   database: String(process.env.DATABASE_NAME),
-  entities: [
-    // __dirname + "/entities/*.ts"
-    Question,
-  ],
+  entities: [Grouping, QuestionGroup, Question],
   synchronize: false,
-  logging: true,
+  logging: false,
 }
 
 export default async function getDatabaseConnection(): Promise<ConnectionResult> {
