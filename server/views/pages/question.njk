@@ -14,12 +14,26 @@
         </tr>
       </thead>
       <tbody class="govuk-table__body">
-        {% for row in rows %}
+        {% for field in question %}
         <tr class="govuk-table__row">          
-          <th scope="row" class="govuk-table__header">{{ row.field }}</th>
-          <td class="govuk-table__cell">{{ row.value }}</td>
+          <th scope="row" class="govuk-table__header">{{ field.name }}</th>
+          <td class="govuk-table__cell">{{ field.value }}</td>
         </tr>
         {% endfor %}
+        {% if validation %}
+          <tr class="govuk-table__row">          
+            <th scope="row" class="govuk-table__header">Validation</th>
+            <td class="govuk-table__cell">            
+            {% for rule in validation %}
+            <p class="govuk-!-font-weight-bold">Error - {{rule.name | capitalize}}</p>            
+            <ul class="govuk-list">
+              <li>Message: {{rule.messages.errorMessage}}</span>
+              <li>Summary: {{rule.messages.errorSummary}}</span>
+            </ul>            
+            {% endfor %}
+            </td>
+          </tr>
+        {% endif %}
       </tbody>
     </table>
   </main>

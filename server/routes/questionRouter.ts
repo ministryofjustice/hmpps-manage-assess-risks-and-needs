@@ -37,17 +37,22 @@ export default function questionRouter(
       const [questionGroupEntity] = await questionGroupRepository.find(withContentUuid(req.params.questionUuid))
       res.render('pages/question', {
         title: 'Viewing Question',
-        rows: [
-          { field: 'Question', value: question.questionText },
-          { field: 'Help Text', value: question.questionHelpText },
-          { field: 'Answer Type', value: question.answerType },
-          { field: 'Question Code', value: question.questionCode },
-          { field: 'OASys Code', value: question.oasysQuestionCode },
-          { field: 'Reference Data', value: question.referenceDataCategory },
-          { field: 'Mandatory', value: questionGroupEntity.mandatory ? 'Yes' : 'No' },
-          { field: 'Readonly', value: questionGroupEntity.readOnly ? 'Yes' : 'No' },
-          { field: 'Validation', value: questionGroupEntity.validation },
+        question: [
+          { name: 'Question', value: question.questionText },
+          { name: 'Help Text', value: question.questionHelpText },
+          { name: 'Answer Type', value: question.answerType },
+          { name: 'Question Code', value: question.questionCode },
+          { name: 'OASys Code', value: question.oasysQuestionCode },
+          { name: 'Reference Data', value: question.referenceDataCategory },
+          { name: 'Mandatory', value: questionGroupEntity.mandatory ? 'Yes' : 'No' },
+          { name: 'Readonly', value: questionGroupEntity.readOnly ? 'Yes' : 'No' },
         ],
+        validation: questionGroupEntity.validation
+          ? Object.entries(JSON.parse(questionGroupEntity.validation)).map(([name, messages]) => ({
+              name,
+              messages,
+            }))
+          : null, // 🤷‍♂️ Just parsing the validation - will refactor
       })
     } catch (error) {
       res.status(error.status || 500).send(error.message)
@@ -130,7 +135,7 @@ export default function questionRouter(
     }
   })
 
-  router.get('/groupings', async (req, res) => {
+  router.get('/assessments', async (req, res) => {
     try {
       const results: Array<Grouping> = await groupingRepository.query(
         'SELECT ' +
