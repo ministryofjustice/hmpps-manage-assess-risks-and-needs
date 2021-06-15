@@ -1,0 +1,35 @@
+{% extends "../partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Home" %}
+
+{% block content %}
+
+  <main class="app-container govuk-body">
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--m">{{ title }}</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">          
+          <th scope="col" class="govuk-table__header">Position</th>
+          <th scope="col" class="govuk-table__header">Heading</th>          
+          <th scope="col" class="govuk-table__header">Type</th>
+          <th scope="col" class="govuk-table__header">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for row in rows %}
+        <tr class="govuk-table__row">          
+          <td class="govuk-table__cell">{{ row.displayOrder }}</td>
+          <th scope="row" class="govuk-table__header">{{ row.heading }}</th>          
+          <td class="govuk-table__cell">{{ row.type }}</td>
+          {% if row.type === "Group" %}
+            <td class="govuk-table__cell"><a href="/questions/group/{{ row.contentUuid }}" class="govuk-link">View Group</a></td>
+          {% else %}
+            <td class="govuk-table__cell"><a href="/question/{{ row.contentUuid }}" class="govuk-link">View Question</a></td>
+          {% endif %}
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </main>
+
+{% endblock %}

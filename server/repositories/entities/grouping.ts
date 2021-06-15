@@ -27,6 +27,6 @@ export default class Grouping {
   @Column({ name: 'group_end' })
   groupEnd: Date
 
-  @OneToMany('QuestionGroup', 'group', { eager: true })
-  contents: Array<QuestionGroup>
+  @OneToMany('QuestionGroup', 'group', { eager: false })
+  contents: Promise<Array<QuestionGroup>>
 }

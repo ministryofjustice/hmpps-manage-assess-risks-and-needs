@@ -29,5 +29,5 @@ export default class QuestionGroup {
 
   @ManyToOne('Grouping', 'contents', { eager: false })
   @JoinColumn({ name: 'group_uuid', referencedColumnName: 'groupUuid' })
-  group: Grouping
+  group: Promise<Grouping>
 }
