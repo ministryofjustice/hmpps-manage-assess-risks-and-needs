@@ -28,6 +28,7 @@ generic-service:
     NODE_ENV: "production"
     REDIS_TLS_ENABLED: "true"
     TOKEN_VERIFICATION_ENABLED: "true"
+    DATABASE_SCHEMA: "hmppsassessmentsapi"
 
   # Pre-existing kubernetes secrets to load as environment variables in the deployment.
   # namespace_secrets:
@@ -35,15 +36,18 @@ generic-service:
   #     [name of environment variable as seen by app]: [key of kubernetes secret to load]
 
   namespace_secrets:
-    hmpps-assessments-api:
-      SYSTEM_CLIENT_ID: "API_CLIENT_ID"
-      SYSTEM_CLIENT_SECRET: "API_CLIENT_SECRET"
-    hmpps-risk-assessment-ui:
+    hmpps-manage-assess-risks-and-needs:
+      SYSTEM_CLIENT_ID: "SYSTEM_CLIENT_ID"
+      SYSTEM_CLIENT_SECRET: "SYSTEM_CLIENT_SECRET"
       API_CLIENT_ID: "API_CLIENT_ID"
       API_CLIENT_SECRET: "API_CLIENT_SECRET"
-    hmpps-manage-assess-risks-and-needs:
       SESSION_SECRET: "SESSION_SECRET"
       APPINSIGHTS_INSTRUMENTATIONKEY: "APPINSIGHTS_INSTRUMENTATIONKEY"
+    hmpps-assessments-rds-instance-output:
+      DATABASE_HOST: "rds_instance_address"
+      DATABASE_USER: "database_username"
+      DATABASE_PASSWORD: "database_password"
+      DATABASE_NAME: "database_name"
     hmpps-assessments-elasticache-redis:
       REDIS_HOST: "primary_endpoint_address"
       REDIS_AUTH_TOKEN: "auth_token"
