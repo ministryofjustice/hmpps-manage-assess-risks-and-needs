@@ -15,7 +15,7 @@ const connectionOptions: ConnectionOptions = {
   password: String(process.env.DATABASE_PASSWORD),
   database: String(process.env.DATABASE_NAME),
   entities: [Grouping, QuestionGroup, Question],
-  synchronize: false,
+  synchronize: Boolean(process.env.DATABASE_SYNCHRONIZE) || false,
   logging: false,
 }
 
