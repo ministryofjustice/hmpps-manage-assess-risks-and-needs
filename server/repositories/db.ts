@@ -17,6 +17,9 @@ const connectionOptions: ConnectionOptions = {
   entities: [Grouping, QuestionGroup, Question],
   migrationsRun: Boolean(process.env.DATABASE_RUN_MIGRATIONS) || false,
   migrations: ['dist/db/migrations/*.js'],
+  extra: {
+    ssl: Boolean(process.env.DATABASE_USE_SSL) || false,
+  },
 }
 
 export default async function getDatabaseConnection(): Promise<ConnectionResult> {
