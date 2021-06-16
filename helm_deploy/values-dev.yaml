@@ -5,7 +5,7 @@ generic-service:
   replicaCount: 2
 
   ingress:
-    enabled: false
+    enabled: true
     host: manage-assess-risks-and-needs-dev.hmpps.service.justice.gov.uk
 
   env:
