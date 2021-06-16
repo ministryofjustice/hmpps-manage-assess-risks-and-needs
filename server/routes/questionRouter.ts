@@ -36,7 +36,8 @@ export default function questionRouter(
       const [question] = await questionRepository.find(withQuestionUuid(req.params.questionUuid))
       const [questionGroupEntity] = await questionGroupRepository.find(withContentUuid(req.params.questionUuid))
       res.render('pages/question', {
-        title: 'Viewing Question',
+        heading: 'Question',
+        subHeading: 'Properties',
         question: [
           { name: 'Question', value: question.questionText },
           { name: 'Help Text', value: question.questionHelpText },
@@ -129,7 +130,8 @@ export default function questionRouter(
       }))
 
       res.render('pages/group', {
-        title: `Content for ${questionGroup.heading}`,
+        heading: questionGroup.heading,
+        subHeading: 'Content in the group',
         components: [...formattedQuestions, ...formattedGroups].sort((a, b) => a.displayOrder - b.displayOrder),
       })
     } catch (error) {
@@ -151,7 +153,7 @@ export default function questionRouter(
           'NOT IN (SELECT DISTINCT "content_uuid" FROM "hmppsassessmentsapi"."question_group")'
       )
       res.render('pages/groupings', {
-        title: 'Groups',
+        heading: 'Assessments',
         rows: results.map(({ heading, subheading, groupCode, groupUuid }) => ({
           heading,
           subheading,
