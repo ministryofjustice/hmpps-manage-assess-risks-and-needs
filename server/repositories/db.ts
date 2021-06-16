@@ -20,7 +20,7 @@ const connectionOptions: ConnectionOptions = {
   migrations: ['dist/db/migrations/*.js'],
   ssl: process.env.DATABASE_USE_SSL
     ? {
-        rejectUnauthorized: false,
+        rejectUnauthorized: true,
         ca: fs.readFileSync('/usr/local/share/ca-certificates/extra/eu-west-2-bundle.pem').toString(),
       }
     : false,
