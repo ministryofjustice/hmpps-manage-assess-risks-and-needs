@@ -141,16 +141,11 @@ export default function questionRouter(
 
   router.get('/assessments', async (req, res) => {
     try {
+      const schema = String(process.env.DATABASE_SCHEMA)
       const results: Array<Grouping> = await groupingRepository.query(
-        'SELECT ' +
-          '"heading", ' +
-          '"subheading", ' +
-          '"group_uuid" AS "groupUuid", ' +
-          '"group_code" AS "groupCode", ' +
-          '"help_text" AS "help_text" ' +
-          'FROM "hmppsassessmentsapi"."grouping" ' +
-          'WHERE "group_uuid" ' +
-          'NOT IN (SELECT DISTINCT "content_uuid" FROM "hmppsassessmentsapi"."question_group")'
+        'SELECT "heading", "subheading", "group_uuid" AS "groupUuid", "group_code" AS "groupCode", "help_text" AS "help_text" ' +
+          `FROM "${schema}"."grouping" ` +
+          `WHERE "group_uuid" NOT IN (SELECT DISTINCT "content_uuid" FROM "${schema}"."question_group")`
       )
       res.render('pages/groupings', {
         heading: 'Assessments',
