@@ -41,6 +41,9 @@ RUN npm prune --no-audit --production
 # Stage: copy production assets and dependencies
 FROM base
 
+RUN mkdir -p /usr/local/share/ca-certificates/extra
+ADD https://truststore.pki.rds.amazonaws.com/eu-west-2/eu-west-2-bundle.pem /usr/local/share/ca-certificates/extra/eu-west-2-bundle.pem
+
 RUN apt-get autoremove -y && \
     rm -rf /var/lib/apt/lists/*
 

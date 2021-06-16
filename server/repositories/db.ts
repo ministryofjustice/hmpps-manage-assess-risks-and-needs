@@ -1,4 +1,5 @@
 import { Connection, ConnectionOptions, createConnection } from 'typeorm'
+import fs from 'fs'
 import logger from '../../logger'
 import Grouping from './entities/grouping'
 import Question from './entities/question'
@@ -15,11 +16,14 @@ const connectionOptions: ConnectionOptions = {
   password: String(process.env.DATABASE_PASSWORD),
   database: String(process.env.DATABASE_NAME),
   entities: [Grouping, QuestionGroup, Question],
-  migrationsRun: Boolean(process.env.DATABASE_RUN_MIGRATIONS) || false,
+  migrationsRun: Boolean(process.env.DATABASE_RUN_MIGRATIONS),
   migrations: ['dist/db/migrations/*.js'],
-  extra: {
-    ssl: Boolean(process.env.DATABASE_USE_SSL) || false,
-  },
+  ssl: process.env.DATABASE_USE_SSL
+    ? {
+        rejectUnauthorized: false,
+        ca: fs.readFileSync('/usr/local/share/ca-certificates/extra/eu-west-2-bundle.pem').toString(),
+      }
+    : false,
 }
 
 export default async function getDatabaseConnection(): Promise<ConnectionResult> {
