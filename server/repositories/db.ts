@@ -21,7 +21,7 @@ const connectionOptions: ConnectionOptions = {
   ssl: process.env.DATABASE_USE_SSL
     ? {
         rejectUnauthorized: true,
-        ca: fs.readFileSync('/usr/local/share/ca-certificates/extra/eu-west-2-bundle.pem').toString(),
+        ca: fs.readFileSync('/app/certs/eu-west-2-bundle.pem').toString(),
       }
     : false,
 }
