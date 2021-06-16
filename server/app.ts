@@ -1,12 +1,15 @@
-import express from 'express'
+import express, { Application } from 'express'
 
 import path from 'path'
 import createError from 'http-errors'
+import 'reflect-metadata'
 
+import { Connection } from 'typeorm'
 import indexRoutes from './routes'
 import nunjucksSetup from './utils/nunjucksSetup'
 import errorHandler from './errorHandler'
 import standardRouter from './routes/standardRouter'
+import questionRouter from './routes/questionRouter'
 import type UserService from './services/userService'
 
 import setUpWebSession from './middleware/setUpWebSession'
@@ -16,8 +19,11 @@ import setUpAuthentication from './middleware/setUpAuthentication'
 import setUpHealthChecks from './middleware/setUpHealthChecks'
 import setUpWebRequestParsing from './middleware/setupRequestParsing'
 import authorisationMiddleware from './middleware/authorisationMiddleware'
+import Question from './repositories/entities/question'
+import QuestionGroup from './repositories/entities/questionGroup'
+import Grouping from './repositories/entities/grouping'
 
-export default function createApp(userService: UserService): express.Application {
+export default function createApplication(userService: UserService, databaseConnection: Connection): Application {
   const app = express()
 
   app.set('json spaces', 2)
@@ -33,7 +39,12 @@ export default function createApp(userService: UserService): express.Application
   app.use(setUpAuthentication())
   app.use(authorisationMiddleware())
 
+  const questionRepository = databaseConnection.getRepository(Question)
+  const questionGroupRepository = databaseConnection.getRepository(QuestionGroup)
+  const groupingRepository = databaseConnection.getRepository(Grouping)
+
   app.use('/', indexRoutes(standardRouter(userService)))
+  app.use('/', indexRoutes(questionRouter(questionRepository, questionGroupRepository, groupingRepository)))
 
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(process.env.NODE_ENV === 'production'))

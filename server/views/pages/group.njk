@@ -1,0 +1,38 @@
+{%- from "../partials/renderFormComponent.njk" import renderFormComponent -%}
+
+{% extends "../partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Home" %}
+
+{% block content %}
+  <script src='/assets/Sortable.min.js'></script>
+
+  <main class="app-container govuk-body">
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+    <ul id="questionGroups" class="govuk-list">
+      {% for component in components %}
+      <li class="question-group draggable">
+        <div class="govuk-grid-component">
+          {% if component.type === "Group" %}
+          <div class="govuk-grid-column-three-quarters">  
+            <h3 class="govuk-heading-s">{{component.heading}}</h3>
+            <a href="/questions/group/{{ component.contentUuid }}" class="govuk-link">View Group</a>
+          </div>
+          {% else %}
+            <div class="govuk-grid-column-three-quarters">
+              {{ renderFormComponent(component) }}
+              </div>
+              <div class="govuk-grid-column-one-quarter question-group__details">
+                <p class="govuk-body govuk-!-font-weight-bold">{{component.type}}</p>
+                <a href="/question/{{component.contentUuid}}" class="govuk-link">View Question</a>
+              </div>
+            {% endif %}            
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
+  </main>
+
+  <script src="/assets/questionGroup.js"></script>
+
+{% endblock %}

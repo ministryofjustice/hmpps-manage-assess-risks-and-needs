@@ -1,0 +1,42 @@
+{% extends "../partials/layout.njk" %}
+
+{% set pageTitle = applicationName + " - Home" %}
+
+{% block content %}
+
+  <main class="app-container govuk-body">
+    <h1 class="govuk-heading-l">{{ heading }}</h1>
+    <table class="govuk-table">
+      <caption class="govuk-table__caption govuk-table__caption--m">{{ subHeading }}</caption>
+      <thead class="govuk-table__head">
+        <tr class="govuk-table__row">          
+          <th scope="col" class="govuk-table__header">Option</th>
+          <th scope="col" class="govuk-table__header">Value</th>
+        </tr>
+      </thead>
+      <tbody class="govuk-table__body">
+        {% for field in question %}
+        <tr class="govuk-table__row">          
+          <th scope="row" class="govuk-table__header">{{ field.name }}</th>
+          <td class="govuk-table__cell">{{ field.value }}</td>
+        </tr>
+        {% endfor %}
+        {% if validation %}
+          <tr class="govuk-table__row">          
+            <th scope="row" class="govuk-table__header">Validation</th>
+            <td class="govuk-table__cell">            
+            {% for rule in validation %}
+            <p class="govuk-!-font-weight-bold">Error - {{rule.name | capitalize}}</p>            
+            <ul class="govuk-list">
+              <li>Message: {{rule.messages.errorMessage}}</span>
+              <li>Summary: {{rule.messages.errorSummary}}</span>
+            </ul>            
+            {% endfor %}
+            </td>
+          </tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </main>
+
+{% endblock %}

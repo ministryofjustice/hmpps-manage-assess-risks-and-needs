@@ -9,6 +9,10 @@ executors:
     docker:
       - image: cimg/node:14.15-browsers
       - image: circleci/redis:buster
+      - image: circleci/postgres:9-ram
+        environment:
+          POSTGRES_USER: ci-user
+          POSTGRES_PASSWORD: $DATABASE_PASSWORD
     working_directory: ~/app
 
 parameters:

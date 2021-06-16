@@ -6,7 +6,7 @@ export default function routes(router: Router): Router {
   const get = (path: string, handler: RequestHandler) => router.get(path, asyncMiddleware(handler))
 
   get('/', (req, res, next) => {
-    res.render('pages/index')
+    res.redirect('/assessments')
   })
 
   return router

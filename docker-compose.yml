@@ -1,21 +1,31 @@
-version: '3.1'
+version: "3.1"
 services:
-
   redis:
-    image: 'bitnami/redis:5.0'
+    image: "bitnami/redis:5.0"
     networks:
       - hmpps
-    container_name: redis 
+    container_name: redis
     environment:
       - ALLOW_EMPTY_PASSWORD=yes
     ports:
-      - '6379:6379'
+      - "6379:6379"
+
+  postgres:
+    image: postgres
+    restart: always
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: dev
+    tmpfs:
+      - /var/lib/postgresql
 
   hmpps-auth:
     image: quay.io/hmpps/hmpps-auth:latest
     networks:
       - hmpps
-    container_name: hmpps-auth 
+    container_name: hmpps-auth
     ports:
       - "9090:8080"
     healthcheck:
@@ -28,7 +38,7 @@ services:
     build: .
     networks:
       - hmpps
-    depends_on: [redis]
+    depends_on: [redis, postgres]
     ports:
       - "3000:3000"
     environment:
