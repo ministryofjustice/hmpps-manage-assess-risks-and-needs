@@ -1,0 +1,172 @@
+{%- from "govuk/components/input/macro.njk" import govukInput -%}
+{%- from "govuk/components/textarea/macro.njk" import govukTextarea -%}
+{%- from "govuk/components/radios/macro.njk" import govukRadios -%}
+{%- from "govuk/components/checkboxes/macro.njk" import govukCheckboxes -%}
+{%- from "govuk/components/select/macro.njk" import govukSelect -%}
+{%- from "govuk/components/date-input/macro.njk" import govukDateInput -%}
+{%- from "govuk/components/summary-list/macro.njk" import govukSummaryList -%}
+{%- from "govuk/components/button/macro.njk" import govukButton -%}
+{%- from "govuk/components/character-count/macro.njk" import govukCharacterCount -%}
+
+{% macro renderFormComponent(element) %}
+
+{% set qType = element.type %}
+{% set regExp1 = r/^presentation: link.*/gi %}
+{% if regExp1.test(qType) %}
+  {% set linkTarget = "#" %}
+  {% set qType = 'presentation: link' %}
+{% endif %}
+
+{% set regExp2 = r/^presentation: buttonlink.*/gi %}
+{% if regExp2.test(qType) %}
+  {% set linkTarget = "#" %}
+  {% set qType = 'presentation: buttonlink' %}
+{% endif %}
+
+{% if qType == 'numeric' %}
+  {% set formClass = question.formClasses + ' numeric' %}
+  {% set qType = 'freetext' %}
+{% endif %}
+
+{% switch qType %}
+  {% case 'presentation: heading' %}
+    <h2 class="govuk-heading-m">{{ element.heading }}</h2>
+  {% case 'presentation: heading_large' %}
+    <h2 class="govuk-heading-l">{{ element.heading }}</h2>
+  {% case 'presentation: divider' %}
+    <hr class="govuk-section-break govuk-section-break--m govuk-section-break--visible">
+  {% case 'presentation: link' %}
+    <div class="body-link__container"><a href="{{ linkTarget }}" class="govuk-link body-link">{{ element.heading }}</a></div>
+  {% case 'presentation: buttonlink' %}
+    {{ govukButton({
+      text: element.heading,
+      classes: 'govuk-button--secondary'
+    }) }}
+  {% case 'presentation: inset' %}
+    <div class="govuk-inset-text">{{ element.heading }}</div>
+  {% case 'noinput' %}
+    {{ govukInput({
+      id: 'id-' + element.contentUuid,
+      name: 'id-' + element.contentUuid,
+      classes: 'moj-hidden',
+      label: {
+        text: element.heading,
+        isPageHeading: false,
+        classes: element.questionCode + ' govuk-label--m'
+      },
+      hint: {
+        text: element.helpText
+      }
+    }) }}
+  {% case 'freetext' %}
+    {{ govukInput({
+      id: 'id-' + element.contentUuid,
+      name: 'id-' + element.contentUuid,                    
+      label: {
+        text: element.heading,
+        isPageHeading: false,
+        classes: element.questionCode + ' govuk-label--m'
+      },
+      hint: {
+        text: element.helpText
+      }
+    }) }}
+  {% case 'textarea' %}
+    {{ govukCharacterCount({
+      name:'id-' + element.contentUuid,
+      id: 'id-' + element.contentUuid,
+      maxlength: 4000,
+      label: {
+        text: element.heading,
+        isPageHeading: false,
+        classes: element.questionCode + ' govuk-label--m'
+      },
+      hint: {
+        text: element.helpText
+      }
+    }) }}
+  {% case 'radio' %}
+    {{ govukRadios({
+      idPrefix: 'id-' + element.contentUuid,
+      name: 'id-' + element.contentUuid,
+      fieldset: {
+        legend: {
+          text: element.heading,
+          classes: element.questionCode + ' govuk-label--m'
+        }
+      },
+      items: [{ text: "Foo", value: "foo" }, { text: "Bar", value: "bar" }],
+      hint: {
+        text: element.helpText
+      }
+    }) }}
+  {% case 'checkbox' %}
+    {{ govukCheckboxes({
+      idPrefix: 'id-' + element.contentUuid,
+      name: 'id-' + element.contentUuid,
+      fieldset: {
+        legend: {
+          text: element.heading,
+          classes: element.questionCode + ' govuk-label--m'
+        }
+      },
+      items: [{ text: "Foo", value: "foo" }, { text: "Bar", value: "bar" }],
+      hint: {
+        text: element.helpText
+      }
+    }) }}
+  {% case 'dropdown' %}
+    {{ govukSelect({
+      id: 'id-' + element.contentUuid,
+      name: 'id-' + element.contentUuid,
+      label: {
+        text: element.heading,
+        classes: element.questionCode + ' govuk-label--m'
+      },
+      items: [{ text: "Foo", value: "foo" }, { text: "Bar", value: "bar" }],
+      hint: {
+        text: element.helpText
+      }
+    }) }}
+  {% case 'date' %}
+    {% set answerDay = '' %}
+    {% set answerMonth = '' %}
+    {% set answerYear = '' %}
+
+    {{ govukDateInput({
+      id: 'id-' + element.contentUuid,
+      namePrefix: 'id-' + element.contentUuid,
+      fieldset: {
+        legend: {
+          text: element.heading,
+          isPageHeading: false,
+          classes: element.questionCode + ' govuk-label--m'
+        }
+      },
+      hint: {
+        text: element.helpText
+      },
+      items: [
+        {
+          classes: "govuk-input--width-2",
+          name: "day",
+          value: answerDay
+        },
+        {
+          classes: "govuk-input--width-2",
+          name: "month",
+          value: answerMonth
+        },
+        {
+          classes: "govuk-input--width-4",
+          name: "year",
+          value: answerYear
+        }
+      ]
+    }) }}
+
+  {% default %}
+    <!-- {{ element.contentUuid }} - {{ element.type }} questions are not currently rendered -->
+{% endswitch %}
+
+{% endmacro %}

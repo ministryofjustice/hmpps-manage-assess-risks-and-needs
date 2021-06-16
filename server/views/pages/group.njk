@@ -1,35 +1,38 @@
+{%- from "../partials/renderFormComponent.njk" import renderFormComponent -%}
+
 {% extends "../partials/layout.njk" %}
 
 {% set pageTitle = applicationName + " - Home" %}
 
 {% block content %}
+  <script src='/assets/Sortable.min.js'></script>
 
   <main class="app-container govuk-body">
-    <table class="govuk-table">
-      <caption class="govuk-table__caption govuk-table__caption--m">{{ title }}</caption>
-      <thead class="govuk-table__head">
-        <tr class="govuk-table__row">          
-          <th scope="col" class="govuk-table__header">Position</th>
-          <th scope="col" class="govuk-table__header">Heading</th>          
-          <th scope="col" class="govuk-table__header">Type</th>
-          <th scope="col" class="govuk-table__header">Actions</th>
-        </tr>
-      </thead>
-      <tbody class="govuk-table__body">
-        {% for row in rows %}
-        <tr class="govuk-table__row">          
-          <td class="govuk-table__cell">{{ row.displayOrder }}</td>
-          <th scope="row" class="govuk-table__header">{{ row.heading }}</th>          
-          <td class="govuk-table__cell">{{ row.type }}</td>
-          {% if row.type === "Group" %}
-            <td class="govuk-table__cell"><a href="/questions/group/{{ row.contentUuid }}" class="govuk-link">View Group</a></td>
+    <h2 class="govuk-heading-l">{{ title }}</h2>
+    <ul id="questionGroups" class="govuk-list">
+      {% for component in components %}
+      <li class="question-group draggable">
+        <div class="govuk-grid-component">
+          {% if component.type === "Group" %}
+          <div class="govuk-grid-column-three-quarters">  
+            <h3 class="govuk-heading-s">{{component.heading}}</h3>
+            <a href="/questions/group/{{ component.contentUuid }}" class="govuk-link">View Group</a>
+          </div>
           {% else %}
-            <td class="govuk-table__cell"><a href="/question/{{ row.contentUuid }}" class="govuk-link">View Question</a></td>
-          {% endif %}
-        </tr>
-        {% endfor %}
-      </tbody>
-    </table>
+            <div class="govuk-grid-column-three-quarters">
+              {{ renderFormComponent(component) }}
+              </div>
+              <div class="govuk-grid-column-one-quarter question-group__details">
+                <p class="govuk-body govuk-!-font-weight-bold">{{component.type}}</p>
+                <a href="/question/{{component.contentUuid}}" class="govuk-link">View Question</a>
+              </div>
+            {% endif %}            
+        </div>
+      </li>
+      {% endfor %}
+    </ul>
   </main>
+
+  <script src="/assets/questionGroup.js"></script>
 
 {% endblock %}
