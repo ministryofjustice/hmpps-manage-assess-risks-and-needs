@@ -16,7 +16,7 @@ const connectionOptions: ConnectionOptions = {
   database: String(process.env.DATABASE_NAME),
   entities: [Grouping, QuestionGroup, Question],
   migrationsRun: Boolean(process.env.DATABASE_RUN_MIGRATIONS) || false,
-  logging: false,
+  migrations: ['dist/db/migrations/*.js'],
 }
 
 export default async function getDatabaseConnection(): Promise<ConnectionResult> {
