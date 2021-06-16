@@ -1,0 +1,6 @@
+{
+  "synchronize": true,
+  "migrations": [
+    "db/migrations/*.sql"
+  ]
+}
