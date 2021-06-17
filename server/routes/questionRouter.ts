@@ -103,7 +103,15 @@ export default function questionRouter(
       const questions = questionUuids.length > 0 ? await questionRepository.find(withUuids(questionUuids)) : []
 
       const formattedQuestions = questions.map(
-        ({ questionText, questionHelpText, questionSchemaUuid, answerType, questionCode, oasysQuestionCode }) => ({
+        ({
+          questionText,
+          questionHelpText,
+          questionSchemaUuid,
+          answerType,
+          questionCode,
+          oasysQuestionCode,
+          answerSchema,
+        }) => ({
           heading: questionText,
           helpText: questionHelpText,
           type: answerType,
@@ -111,6 +119,7 @@ export default function questionRouter(
           displayOrder: contentPositions.get(questionSchemaUuid),
           questionCode,
           oasysQuestionCode,
+          answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
         })
       )
 
