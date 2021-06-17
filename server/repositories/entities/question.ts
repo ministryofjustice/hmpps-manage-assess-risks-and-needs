@@ -1,4 +1,5 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm'
+import { Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn } from 'typeorm'
+import type AnswerGroup from './answerGroup'
 
 @Entity({ name: 'question_schema' })
 export default class Question {
@@ -34,4 +35,8 @@ export default class Question {
 
   @Column({ name: 'reference_data_category' })
   referenceDataCategory: string
+
+  @ManyToOne('AnswerGroup', 'questions', { eager: true })
+  @JoinColumn({ name: 'answer_schema_group_uuid', referencedColumnName: 'answerSchemaGroupUuid' })
+  answerSchema: AnswerGroup
 }
