@@ -1,5 +1,6 @@
 import { Router } from 'express'
-import { Repository } from 'typeorm'
+import { getManager, Repository } from 'typeorm'
+import logger from '../../logger'
 import Grouping from '../repositories/entities/grouping'
 import Question from '../repositories/entities/question'
 import QuestionGroup from '../repositories/entities/questionGroup'
@@ -10,6 +11,11 @@ export default function questionRouter(
   groupingRepository: Repository<Grouping>
 ): Router {
   const router = Router({ mergeParams: true })
+
+  router.use((req, res, next) => {
+    res.locals.csrf = req.csrfToken()
+    next()
+  })
 
   router.get('/questions', async (req, res) => {
     try {
@@ -141,6 +147,7 @@ export default function questionRouter(
       res.render('pages/group', {
         heading: questionGroup.heading,
         subHeading: 'Content in the group',
+        groupUuid: req.params.groupUuid,
         components: [...formattedQuestions, ...formattedGroups].sort((a, b) => a.displayOrder - b.displayOrder),
       })
     } catch (error) {
@@ -167,6 +174,42 @@ export default function questionRouter(
       })
     } catch (error) {
       res.status(error.status || 500).send(error.message)
+    }
+  })
+
+  router.post('/questions/group/:groupUuid/update', async (req, res) => {
+    const requestedOrder: Array<string> = req.body
+
+    try {
+      const group = await groupingRepository.findOne(whereGroupUuid(req.params.groupUuid))
+      const contentInGroup = await group.contents
+
+      if (requestedOrder.length !== contentInGroup.length) {
+        logger.info(
+          `Malformed request to update group order - Expected:  ${contentInGroup.length} Actual: ${requestedOrder.length}`
+        )
+        return res.status(400).send('Malformed request')
+      }
+
+      await getManager().transaction(async entityManager => {
+        const reorderedQuestions = requestedOrder.map((contentUuid, i) => {
+          const [question] = contentInGroup.filter(q => q.contentUuid === contentUuid)
+          const requestedPosition = i + 1
+          if (question.displayOrder !== requestedPosition) {
+            logger.debug(`Adjusting order: ${question.displayOrder} => ${requestedPosition}`)
+            question.displayOrder = requestedPosition
+          }
+
+          return question
+        })
+
+        return entityManager.save(reorderedQuestions)
+      })
+
+      return res.send('okay')
+    } catch (error) {
+      logger.info(`Failed to update group order - ${error.message}`)
+      return res.status(500).send('We were unable to update the group order')
     }
   })
 

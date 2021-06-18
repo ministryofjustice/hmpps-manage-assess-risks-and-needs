@@ -7,11 +7,14 @@
 {% block content %}
   <script src='/assets/Sortable.min.js'></script>
 
+  <div id="csrf" data-csrf="{{ csrf }}"></div>
+  <div id="group-uuid" data-group="{{ groupUuid }}"></div>
+
   <main class="app-container govuk-body">
     <h1 class="govuk-heading-l">{{ heading }}</h1>
     <ul id="questionGroups" class="govuk-list">
       {% for component in components %}
-      <li class="question-group draggable">
+      <li class="question-group draggable" data-id="{{ component.contentUuid }}">
         <div class="govuk-grid-row">
           {% if component.type === "Group" %}
           <div class="govuk-grid-column-three-quarters">  
@@ -32,6 +35,12 @@
       {% endfor %}
     </ul>
   </main>
+
+  <span id="save-group-order-error" class="govuk-error-message govuk-visually-hidden"></span>
+
+  <button id="save-group-order" class="govuk-button" data-module="govuk-button">
+    Save    
+  </button>
 
   <script src="/assets/questionGroup.js"></script>
 
