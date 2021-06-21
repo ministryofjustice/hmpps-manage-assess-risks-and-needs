@@ -38,5 +38,5 @@ export default class Question {
 
   @ManyToOne('AnswerGroup', 'questions', { eager: true })
   @JoinColumn({ name: 'answer_schema_group_uuid', referencedColumnName: 'answerSchemaGroupUuid' })
-  answerSchema: AnswerGroup
+  answerSchema: AnswerGroup | null
 }
