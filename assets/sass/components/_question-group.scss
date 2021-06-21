@@ -7,3 +7,17 @@
 
 .question-group__details {
 }
+
+.question-group__notification {    
+    color: govuk-colour('white');
+    font-weight: bold;
+    padding: govuk-spacing(3);
+}
+
+.question-group__notification--success {
+    background-color: $govuk-success-colour;
+}
+
+.question-group__notification--failure {
+    background-color: $govuk-error-colour;
+}

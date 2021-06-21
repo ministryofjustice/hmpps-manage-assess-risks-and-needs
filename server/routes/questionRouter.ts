@@ -1,14 +1,19 @@
 import { Router } from 'express'
 import { getManager, Repository } from 'typeorm'
 import logger from '../../logger'
+import AnswerGroup from '../repositories/entities/answerGroup'
 import Grouping from '../repositories/entities/grouping'
 import Question from '../repositories/entities/question'
 import QuestionGroup from '../repositories/entities/questionGroup'
+import { getAnswerTypes } from './dto/answerTypes'
+import { questionResponseFrom } from './dto/questionResponse'
+import UpdateQuestionRequest, { isMandatory, isReadOnly } from './dto/updateQuestionRequest'
 
 export default function questionRouter(
   questionRepository: Repository<Question>,
   questionGroupRepository: Repository<QuestionGroup>,
-  groupingRepository: Repository<Grouping>
+  groupingRepository: Repository<Grouping>,
+  answerGroupRepository: Repository<AnswerGroup>
 ): Router {
   const router = Router({ mergeParams: true })
 
@@ -51,8 +56,8 @@ export default function questionRouter(
           { name: 'Question Code', value: question.questionCode },
           { name: 'OASys Code', value: question.oasysQuestionCode },
           { name: 'Reference Data', value: question.referenceDataCategory },
-          { name: 'Mandatory', value: questionGroupEntity.mandatory ? 'Yes' : 'No' },
-          { name: 'Readonly', value: questionGroupEntity.readOnly ? 'Yes' : 'No' },
+          { name: 'Mandatory', value: questionGroupEntity.mandatory },
+          { name: 'Readonly', value: questionGroupEntity.readOnly },
         ],
         validation: questionGroupEntity.validation
           ? Object.entries(JSON.parse(questionGroupEntity.validation)).map(([name, messages]) => ({
@@ -92,14 +97,9 @@ export default function questionRouter(
 
   router.get('/questions/group/:groupUuid', async (req, res) => {
     try {
-      const [questionGroup] = await groupingRepository.find(whereGroupUuid(req.params.groupUuid))
+      const questionGroup = await groupingRepository.findOne(whereGroupUuid(req.params.groupUuid))
 
       const contentInGroup = await questionGroup.contents
-
-      const contentPositions = new Map<string, number>()
-      contentInGroup.forEach(({ contentUuid, displayOrder }) => {
-        contentPositions.set(contentUuid, displayOrder)
-      })
 
       // Get questions
       const questionUuids = contentInGroup
@@ -117,16 +117,22 @@ export default function questionRouter(
           questionCode,
           oasysQuestionCode,
           answerSchema,
-        }) => ({
-          heading: questionText,
-          helpText: questionHelpText,
-          type: answerType,
-          contentUuid: questionSchemaUuid,
-          displayOrder: contentPositions.get(questionSchemaUuid),
-          questionCode,
-          oasysQuestionCode,
-          answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
-        })
+        }) => {
+          const [additionalInformation] = contentInGroup.filter(q => q.contentUuid === questionSchemaUuid)
+          return {
+            heading: questionText,
+            helpText: questionHelpText,
+            type: answerType,
+            contentUuid: questionSchemaUuid,
+            displayOrder: additionalInformation?.displayOrder,
+            questionCode,
+            oasysQuestionCode,
+            answerGroup: answerSchema?.answerSchemaGroupUuid || null,
+            answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
+            mandatory: additionalInformation?.mandatory,
+            readOnly: additionalInformation?.readOnly,
+          }
+        }
       )
 
       // Get groups
@@ -136,18 +142,35 @@ export default function questionRouter(
 
       const groups = groupUuids.length > 0 ? await groupingRepository.find(withUuids(groupUuids)) : []
 
-      const formattedGroups = groups.map(({ heading, helpText, groupUuid }) => ({
-        heading,
-        helpText,
-        type: 'Group',
-        contentUuid: groupUuid,
-        displayOrder: contentPositions.get(groupUuid),
-      }))
+      const formattedGroups = groups.map(({ heading, helpText, groupUuid }) => {
+        const [additionalInformation] = contentInGroup.filter(q => q.contentUuid === groupUuid)
+        return {
+          heading,
+          helpText,
+          type: 'Group',
+          contentUuid: groupUuid,
+          displayOrder: additionalInformation?.displayOrder,
+        }
+      })
+
+      // Get Answer groups
+
+      type MultipleChoiceOption = { text: string; value: string | null }
+
+      const answerGroups: Array<MultipleChoiceOption> = await answerGroupRepository.find().then(ag => [
+        ...ag.map(({ answerSchemaGroupCode, answerSchemaGroupUuid }) => ({
+          text: answerSchemaGroupCode,
+          value: answerSchemaGroupUuid,
+        })),
+        { text: 'None', value: null },
+      ])
 
       res.render('pages/group', {
         heading: questionGroup.heading,
         subHeading: 'Content in the group',
         groupUuid: req.params.groupUuid,
+        answerTypes: getAnswerTypes(),
+        answerGroups,
         components: [...formattedQuestions, ...formattedGroups].sort((a, b) => a.displayOrder - b.displayOrder),
       })
     } catch (error) {
@@ -207,6 +230,39 @@ export default function questionRouter(
       })
 
       return res.send('okay')
+    } catch (error) {
+      logger.info(`Failed to update group order - ${error.message}`)
+      return res.status(500).send('We were unable to update the group order')
+    }
+  })
+
+  router.post('/questions/:questionUuid/update', async (req, res) => {
+    try {
+      const updatedQuestion: UpdateQuestionRequest = req.body
+      const question = await questionRepository.findOne(withQuestionUuid(req.params.questionUuid))
+      const questionGroupEntity = await questionGroupRepository.findOne(withContentUuid(req.params.questionUuid))
+
+      await getManager().transaction(async entityManager => {
+        question.questionText = updatedQuestion.questionText
+        question.questionHelpText = updatedQuestion.helpText
+        question.answerType = updatedQuestion.type
+        question.answerSchema = updatedQuestion.answerGroup
+          ? await answerGroupRepository.findOne({ where: { answerSchemaGroupUuid: updatedQuestion.answerGroup } })
+          : null
+        question.oasysQuestionCode = updatedQuestion.oasysQuestionCode
+        question.referenceDataCategory = updatedQuestion.referenceDataCategory
+
+        await entityManager.save(question)
+
+        questionGroupEntity.mandatory = isMandatory(updatedQuestion)
+        questionGroupEntity.readOnly = isReadOnly(updatedQuestion)
+
+        await entityManager.save(questionGroupEntity)
+      })
+
+      return res.render('pages/questionResponse', {
+        question: questionResponseFrom(question, questionGroupEntity),
+      })
     } catch (error) {
       logger.info(`Failed to update group order - ${error.message}`)
       return res.status(500).send('We were unable to update the group order')

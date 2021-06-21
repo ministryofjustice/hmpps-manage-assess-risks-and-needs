@@ -1,4 +1,5 @@
 {%- from "../partials/renderFormComponent.njk" import renderFormComponent -%}
+{%- from "../partials/questionEditor.njk" import questionEditor -%}
 
 {% extends "../partials/layout.njk" %}
 
@@ -6,6 +7,7 @@
 
 {% block content %}
   <script src='/assets/Sortable.min.js'></script>
+  <script src='/assets/dist/purify.min.js'></script>
 
   <div id="csrf" data-csrf="{{ csrf }}"></div>
   <div id="group-uuid" data-group="{{ groupUuid }}"></div>
@@ -15,22 +17,33 @@
     <ul id="questionGroups" class="govuk-list">
       {% for component in components %}
       <li class="question-group draggable" data-id="{{ component.contentUuid }}">
-        <div class="govuk-grid-row">
+        <div id="notification-wrapper-{{ component.contentUuid }}" class="govuk-grid-row govuk-visually-hidden">
+          <div class="govuk-grid-column-full">
+            <p id="notification-{{ component.contentUuid }}" class="govuk-body question-group__notification"></p>
+          </div>
+        </div>
+        <div id="element-{{ component.contentUuid }}" class="govuk-grid-row">
           {% if component.type === "Group" %}
           <div class="govuk-grid-column-three-quarters">  
             <h3 class="govuk-heading-s">{{component.heading}}</h3>
             <a href="/questions/group/{{ component.contentUuid }}" class="govuk-link">View Group</a>
           </div>
           {% else %}
-          <div class="govuk-grid-column-three-quarters">
+          <div id="preview-{{ component.contentUuid }}" class="govuk-grid-column-three-quarters">
             {{ renderFormComponent(component) }}
           </div>
-          <div class="govuk-grid-column-one-quarter question-group__details">
-              <p class="govuk-body govuk-!-font-weight-bold">{{component.type}}</p>
-              <a href="/question/{{component.contentUuid}}" class="govuk-link">View Question</a>
+          <div class="govuk-grid-column-one-quarter question-group__details">            
+              <a id="open-edit-{{ component.contentUuid  }}" href="#" class="govuk-link">Edit Question</a>
           </div>
           {% endif %}
         </div>
+        {% if component.type !== "Group" %}
+        <div id="edit-{{ component.contentUuid  }}" class="govuk-grid-row govuk-visually-hidden">
+          <div class="govuk-grid-column-full">  
+            {{ questionEditor(component, answerTypes, answerGroups) }}
+          </div>
+        </div>
+        {% endif %}
       </li>
       {% endfor %}
     </ul>
@@ -39,9 +52,10 @@
   <span id="save-group-order-error" class="govuk-error-message govuk-visually-hidden"></span>
 
   <button id="save-group-order" class="govuk-button" data-module="govuk-button">
-    Save    
+    Save
   </button>
 
+  <script src="/assets/question.js"></script>
   <script src="/assets/questionGroup.js"></script>
 
 {% endblock %}
