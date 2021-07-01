@@ -1,4 +1,4 @@
-import express, { Router, Express } from 'express'
+import express, { Router, Express, RequestHandler } from 'express'
 import cookieSession from 'cookie-session'
 import createError from 'http-errors'
 import path from 'path'
@@ -45,8 +45,8 @@ function appSetup(route: Router, production: boolean): Express {
   })
 
   app.use(cookieSession({ keys: [''] }))
-  app.use(express.json())
-  app.use(express.urlencoded({ extended: true }))
+  app.use(express.json() as RequestHandler)
+  app.use(express.urlencoded({ extended: true }) as RequestHandler)
   app.use('/', route)
   app.use((req, res, next) => next(createError(404, 'Not found')))
   app.use(errorHandler(production))
