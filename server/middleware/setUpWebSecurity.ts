@@ -1,4 +1,4 @@
-import express, { Router } from 'express'
+import express, { RequestHandler, Router } from 'express'
 import helmet from 'helmet'
 
 export default function setUpWebSecurity(): Router {
@@ -18,7 +18,7 @@ export default function setUpWebSecurity(): Router {
           fontSrc: ["'self'"],
         },
       },
-    })
+    }) as RequestHandler
   )
   return router
 }
