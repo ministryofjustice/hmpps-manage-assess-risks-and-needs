@@ -11,7 +11,6 @@ type QuestionResponse = {
   contentUuid: string
   displayOrder: number
   questionCode: string
-  oasysQuestionCode: string
   answers: MultipleChoiceOptions
   mandatory: boolean
   readOnly: boolean
@@ -25,7 +24,6 @@ export function questionResponseFrom(question: Question, questionGroup: Question
     contentUuid: question.questionSchemaUuid,
     displayOrder: questionGroup.displayOrder,
     questionCode: question.questionCode,
-    oasysQuestionCode: question.oasysQuestionCode,
     answers: question.answerSchema?.answers.map(({ value, text }): MultipleChoiceOption => ({ value, text })),
     mandatory: questionGroup.mandatory,
     readOnly: questionGroup.readOnly,

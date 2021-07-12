@@ -49,7 +49,7 @@
       {% endfor %}
     </select>
   </div>
-  {{ govukInput({
+  {# {{ govukInput({
     label: {
       text: "OASys code",
       classes: "govuk-label--s"
@@ -57,7 +57,7 @@
     id:  question.contentUuid + "oasys-question-code",
     name: "oasys-question-code",
     value: question.oasysQuestionCode
-  }) }}
+  }) }} #}
   {{ govukInput({
     label: {
       text: "Reference data code",
