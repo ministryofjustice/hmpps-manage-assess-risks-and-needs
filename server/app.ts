@@ -23,6 +23,8 @@ import Question from './repositories/entities/question'
 import QuestionGroup from './repositories/entities/questionGroup'
 import Grouping from './repositories/entities/grouping'
 import AnswerGroup from './repositories/entities/answerGroup'
+import QuestionDependency from './repositories/entities/questionDependency'
+import AssessmentSchemaGroups from './repositories/entities/assessmentSchemaGroup'
 
 export default function createApplication(userService: UserService, databaseConnection: Connection): Application {
   const app = express()
@@ -44,11 +46,22 @@ export default function createApplication(userService: UserService, databaseConn
   const questionGroupRepository = databaseConnection.getRepository(QuestionGroup)
   const groupingRepository = databaseConnection.getRepository(Grouping)
   const answerGroupRepository = databaseConnection.getRepository(AnswerGroup)
+  const questionDependencyRepository = databaseConnection.getRepository(QuestionDependency)
+  const assessmentTypeRepository = databaseConnection.getRepository(AssessmentSchemaGroups)
 
   app.use('/', indexRoutes(standardRouter(userService)))
   app.use(
     '/',
-    indexRoutes(questionRouter(questionRepository, questionGroupRepository, groupingRepository, answerGroupRepository))
+    indexRoutes(
+      questionRouter(
+        questionRepository,
+        questionGroupRepository,
+        groupingRepository,
+        answerGroupRepository,
+        questionDependencyRepository,
+        assessmentTypeRepository
+      )
+    )
   )
 
   app.use((req, res, next) => next(createError(404, 'Not found')))

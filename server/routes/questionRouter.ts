@@ -2,8 +2,10 @@ import { Router } from 'express'
 import { getManager, Repository } from 'typeorm'
 import logger from '../../logger'
 import AnswerGroup from '../repositories/entities/answerGroup'
+import AssessmentSchemaGroups from '../repositories/entities/assessmentSchemaGroup'
 import Grouping from '../repositories/entities/grouping'
 import Question from '../repositories/entities/question'
+import QuestionDependency from '../repositories/entities/questionDependency'
 import QuestionGroup from '../repositories/entities/questionGroup'
 import { getAnswerTypes } from './dto/answerTypes'
 import { questionResponseFrom } from './dto/questionResponse'
@@ -13,7 +15,9 @@ export default function questionRouter(
   questionRepository: Repository<Question>,
   questionGroupRepository: Repository<QuestionGroup>,
   groupingRepository: Repository<Grouping>,
-  answerGroupRepository: Repository<AnswerGroup>
+  answerGroupRepository: Repository<AnswerGroup>,
+  questionDependencyRepository: Repository<QuestionDependency>,
+  assessmentRepository: Repository<AssessmentSchemaGroups>
 ): Router {
   const router = Router({ mergeParams: true })
 
@@ -40,6 +44,28 @@ export default function questionRouter(
     where: {
       contentUuid: uuid,
     },
+  })
+
+  router.get('/question/dependencies', async (req, res) => {
+    const questionDependencies = await questionDependencyRepository.find()
+
+    res.json(
+      await Promise.all(
+        questionDependencies.map(async q => {
+          return {
+            id: q.dependencyId,
+            displayInline: q.displayInline,
+            subject: {
+              question: await q.subjectQuestion,
+            },
+            trigger: {
+              question: await q.triggerQuestion,
+              when: q.triggerAnswerValue,
+            },
+          }
+        })
+      )
+    )
   })
 
   router.get('/question/:questionUuid', async (req, res) => {
@@ -117,6 +143,8 @@ export default function questionRouter(
           questionCode,
           oasysQuestionCode,
           answerSchema,
+          subjects,
+          targets,
         }) => {
           const [additionalInformation] = contentInGroup.filter(q => q.contentUuid === questionSchemaUuid)
           return {
@@ -131,6 +159,8 @@ export default function questionRouter(
             answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
             mandatory: additionalInformation?.mandatory,
             readOnly: additionalInformation?.readOnly,
+            subjects,
+            targets,
           }
         }
       )
@@ -180,19 +210,14 @@ export default function questionRouter(
 
   router.get('/assessments', async (req, res) => {
     try {
-      const schema = String(process.env.DATABASE_SCHEMA)
-      const results: Array<Grouping> = await groupingRepository.query(
-        'SELECT "heading", "subheading", "group_uuid" AS "groupUuid", "group_code" AS "groupCode", "help_text" AS "help_text" ' +
-          `FROM "${schema}"."grouping" ` +
-          `WHERE "group_uuid" NOT IN (SELECT DISTINCT "content_uuid" FROM "${schema}"."question_group")`
-      )
+      const results: Array<AssessmentSchemaGroups> = await assessmentRepository.find()
       res.render('pages/groupings', {
         heading: 'Assessments',
-        rows: results.map(({ heading, subheading, groupCode, groupUuid }) => ({
-          heading,
-          subheading,
-          groupCode,
-          groupUuid,
+        rows: results.map(({ assessmentSchema, group }) => ({
+          heading: assessmentSchema?.assessmentName,
+          subheading: '',
+          groupCode: assessmentSchema?.assessmentSchemaCode,
+          groupUuid: group?.groupUuid,
         })),
       })
     } catch (error) {
