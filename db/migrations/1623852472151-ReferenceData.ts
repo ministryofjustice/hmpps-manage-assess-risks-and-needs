@@ -86,6 +86,33 @@ export class ReferenceData1623852472151 implements MigrationInterface {
             ),
             FOREIGN KEY(group_uuid) REFERENCES grouping(group_uuid));
         `)
+    await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS question_dependency(
+            dependency_id           SERIAL      PRIMARY KEY,
+            subject_question_uuid   UUID        NOT NULL,
+            trigger_question_uuid   UUID        NOT NULL,
+            trigger_answer_value    TEXT        NOT NULL,
+            dependency_start        TIMESTAMP   NOT NULL,
+            dependency_end          TIMESTAMP,
+            display_inline          BOOLEAN     NOT NULL);
+        `)
+    await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS assessment_schema(
+            assessment_schema_id                SERIAL      PRIMARY KEY,
+            assessment_schema_uuid              UUID        NOT NULL unique,
+            assessment_schema_code              TEXT        NOT NULL,
+            oasys_assessment_type               TEXT,
+            oasys_create_assessment_at          TEXT,
+            assessment_name                     TEXT);
+        `)
+    await queryRunner.query(`
+            CREATE TABLE IF NOT EXISTS assessment_schema_groups(
+            assessment_schema_group_id  SERIAL      PRIMARY KEY,
+            assessment_schema_uuid      UUID        NOT NULL,
+            group_uuid                  UUID        NOT NULL,
+            FOREIGN KEY (assessment_schema_uuid) REFERENCES assessment_schema (assessment_schema_uuid),
+            FOREIGN KEY (group_uuid) REFERENCES grouping (group_uuid));
+        `)
   }
 
   public async down(queryRunner: QueryRunner): Promise<void> {}
