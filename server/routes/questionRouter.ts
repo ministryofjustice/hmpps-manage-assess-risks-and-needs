@@ -141,6 +141,7 @@ export default function questionRouter(
           answerType,
           questionCode,
           answerSchema,
+          mappings,
           subjects,
           targets,
         }) => {
@@ -156,6 +157,7 @@ export default function questionRouter(
             answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
             mandatory: additionalInformation?.mandatory,
             readOnly: additionalInformation?.readOnly,
+            mappings,
             subjects,
             targets,
           }

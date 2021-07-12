@@ -49,15 +49,6 @@
       {% endfor %}
     </select>
   </div>
-  {# {{ govukInput({
-    label: {
-      text: "OASys code",
-      classes: "govuk-label--s"
-    },
-    id:  question.contentUuid + "oasys-question-code",
-    name: "oasys-question-code",
-    value: question.oasysQuestionCode
-  }) }} #}
   {{ govukInput({
     label: {
       text: "Reference data code",
@@ -83,6 +74,14 @@
       }
     ]
   }) }}
+  {% if question.mappings.length %}
+  <p class="govuk-label--s">This question is the mapped to the following OASys fields:</p>
+  <ul class="govuk-list">
+  {% for mapping in question.mappings %}
+    <li><a href="#" class="govuk-link">{{mapping.sectionCode}}:{{mapping.questionCode}}</a></li>
+  {% endfor %}
+  </ul>
+  {% endif %}
   {% if question.targets.length %}
   <p class="govuk-label--s">This question is the target of:</p>
   <ul class="govuk-list">

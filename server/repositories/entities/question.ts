@@ -1,6 +1,7 @@
 import { Column, Entity, JoinColumn, ManyToOne, OneToMany, PrimaryGeneratedColumn } from 'typeorm'
 import type AnswerGroup from './answerGroup'
 import type QuestionDependency from './questionDependency'
+import type QuestionMapping from './questionMapping'
 
 @Entity({ name: 'question_schema' })
 export default class Question {
@@ -43,4 +44,7 @@ export default class Question {
 
   @OneToMany('QuestionDependency', 'triggerQuestion', { eager: true })
   targets: Array<QuestionDependency> | null
+
+  @OneToMany('QuestionMapping', 'questionSchemaUuid', { eager: true })
+  mappings: Array<QuestionMapping> | null
 }

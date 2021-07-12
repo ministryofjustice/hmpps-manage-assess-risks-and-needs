@@ -9,6 +9,7 @@ import AnswerGroup from './entities/answerGroup'
 import QuestionDependency from './entities/questionDependency'
 import AssessmentSchema from './entities/assessmentSchema'
 import AssessmentSchemaGroups from './entities/assessmentSchemaGroup'
+import QuestionMapping from './entities/questionMapping'
 
 type ConnectionResult = [Error?, Connection?]
 
@@ -23,6 +24,7 @@ const connectionOptions: ConnectionOptions = {
   entities: [
     Grouping,
     QuestionGroup,
+    QuestionMapping,
     Question,
     Answer,
     AnswerGroup,
