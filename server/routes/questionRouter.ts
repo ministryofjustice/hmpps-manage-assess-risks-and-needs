@@ -80,7 +80,6 @@ export default function questionRouter(
           { name: 'Help Text', value: question.questionHelpText },
           { name: 'Answer Type', value: question.answerType },
           { name: 'Question Code', value: question.questionCode },
-          { name: 'OASys Code', value: question.oasysQuestionCode },
           { name: 'Reference Data', value: question.referenceDataCategory },
           { name: 'Mandatory', value: questionGroupEntity.mandatory },
           { name: 'Readonly', value: questionGroupEntity.readOnly },
@@ -141,7 +140,6 @@ export default function questionRouter(
           questionSchemaUuid,
           answerType,
           questionCode,
-          oasysQuestionCode,
           answerSchema,
           subjects,
           targets,
@@ -154,7 +152,6 @@ export default function questionRouter(
             contentUuid: questionSchemaUuid,
             displayOrder: additionalInformation?.displayOrder,
             questionCode,
-            oasysQuestionCode,
             answerGroup: answerSchema?.answerSchemaGroupUuid || null,
             answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
             mandatory: additionalInformation?.mandatory,
@@ -274,7 +271,6 @@ export default function questionRouter(
         question.answerSchema = updatedQuestion.answerGroup
           ? await answerGroupRepository.findOne({ where: { answerSchemaGroupUuid: updatedQuestion.answerGroup } })
           : null
-        question.oasysQuestionCode = updatedQuestion.oasysQuestionCode
         question.referenceDataCategory = updatedQuestion.referenceDataCategory
 
         await entityManager.save(question)

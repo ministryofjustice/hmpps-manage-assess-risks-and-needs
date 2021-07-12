@@ -13,9 +13,6 @@ export default class Question {
   @Column({ name: 'question_code' })
   questionCode: string
 
-  @Column({ name: 'oasys_question_code' })
-  oasysQuestionCode: string
-
   @Column({ name: 'external_source' })
   externalSource: string
 
