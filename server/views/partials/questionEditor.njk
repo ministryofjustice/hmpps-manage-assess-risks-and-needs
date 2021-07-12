@@ -83,6 +83,22 @@
       }
     ]
   }) }}
+  {% if question.targets.length %}
+  <p class="govuk-label--s">This question is the target of:</p>
+  <ul class="govuk-list">
+  {% for target in question.targets %}
+    <li><a href="#" class="govuk-link">Dependency {{target.dependencyId}}</a></li>
+  {% endfor %}
+  </ul>
+  {% endif %}
+  {% if question.subjects.length %}
+  <p class="govuk-label--s">This question is the subject of:</p>
+  <ul class="govuk-list">
+  {% for subject in question.subjects %}
+    <li><a href="#" class="govuk-link">Dependency {{subject.dependencyId}}</a></li>
+  {% endfor %}
+  </ul>
+  {% endif %}
   {{ govukButton({
     text: "Update question",
     type: "submit"

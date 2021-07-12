@@ -16,6 +16,6 @@ export default class AnswerGroup {
   @OneToMany('Answer', 'answerSchemaGroup', { eager: true })
   answers: Array<Answer>
 
-  @OneToMany('Answer', 'questionSchemaUuid', { eager: false })
+  @OneToMany('Question', 'questionSchemaUuid', { eager: false })
   questions: Promise<Array<Question>>
 }
