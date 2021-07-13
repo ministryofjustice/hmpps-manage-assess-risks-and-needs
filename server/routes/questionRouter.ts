@@ -133,35 +133,53 @@ export default function questionRouter(
 
       const questions = questionUuids.length > 0 ? await questionRepository.find(withUuids(questionUuids)) : []
 
-      const formattedQuestions = questions.map(
-        ({
-          questionText,
-          questionHelpText,
-          questionSchemaUuid,
-          answerType,
-          questionCode,
-          answerSchema,
-          mappings,
-          subjects,
-          targets,
-        }) => {
-          const [additionalInformation] = contentInGroup.filter(q => q.contentUuid === questionSchemaUuid)
-          return {
-            heading: questionText,
-            helpText: questionHelpText,
-            type: answerType,
-            contentUuid: questionSchemaUuid,
-            displayOrder: additionalInformation?.displayOrder,
+      const formattedQuestions = await Promise.all(
+        questions.map(
+          async ({
+            questionText,
+            questionHelpText,
+            questionSchemaUuid,
+            answerType,
             questionCode,
-            answerGroup: answerSchema?.answerSchemaGroupUuid || null,
-            answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
-            mandatory: additionalInformation?.mandatory,
-            readOnly: additionalInformation?.readOnly,
+            answerSchema,
             mappings,
             subjects,
             targets,
+          }) => {
+            const [additionalInformation] = contentInGroup.filter(q => q.contentUuid === questionSchemaUuid)
+            return {
+              heading: questionText,
+              helpText: questionHelpText,
+              type: answerType,
+              contentUuid: questionSchemaUuid,
+              displayOrder: additionalInformation?.displayOrder,
+              questionCode,
+              answerGroup: answerSchema?.answerSchemaGroupUuid || null,
+              answers: answerSchema?.answers.map(({ value, text }) => ({ value, text })),
+              mandatory: additionalInformation?.mandatory,
+              readOnly: additionalInformation?.readOnly,
+              mappings,
+              subjects: await Promise.all(
+                subjects.map(async ({ dependencyId, triggerQuestion }) => {
+                  const question = await triggerQuestion
+                  return {
+                    id: dependencyId,
+                    text: question.questionText,
+                  }
+                })
+              ),
+              targets: await Promise.all(
+                targets.map(async ({ dependencyId, subjectQuestion }) => {
+                  const question = await subjectQuestion
+                  return {
+                    id: dependencyId,
+                    text: question.questionText,
+                  }
+                })
+              ),
+            }
           }
-        }
+        )
       )
 
       // Get groups
